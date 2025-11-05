@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机美食推荐器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+        
+        h1 {
+            color: #e74c3c;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .food-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        
+        .food-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 4px solid #ffeaa7;
+        }
+        
+        .food-name {
+            font-size: 20px;
+            color: #e74c3c;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .food-type {
+            background: #ffeaa7;
+            color: #d35400;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .food-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin: 8px 0;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: #e74c3c;
+            font-size: 16px;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .food-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .food-item:last-child {
+            border-bottom: none;
+        }
+        
+        .food-item-name {
+            flex-grow: 1;
+        }
+        
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-group .btn {
+            flex: 1;
+            margin: 0;
+        }
+        
+        .tip {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+        
+        /* 手机屏幕适配 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 5px;
+            }
+            
+            .food-image {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .food-name {
+                font-size: 18px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🍽️</div>
+            <h1>随机美食推荐器</h1>
+            <p class="subtitle">解决你的选择困难症</p>
+        </div>
+        
+        <div class="food-card">
+            <img id="foodImage" class="food-image" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="美食">
+            <h2 id="foodName" class="food-name">披萨</h2>
+            <div id="foodType" class="food-type">西餐</div>
+            <p id="foodDesc" class="food-desc">点击下方按钮随机获取美食推荐</p>
+        </div>
+        
+        <div class="loading" id="loading">正在挑选美味...</div>
+        
+        <button class="btn" id="randomBtn">🎲 随机推荐</button>
+        <button class="btn btn-custom" id="customBtn">📝 自定义菜单</button>
+        <button class="btn btn-secondary" id="shareBtn">📱 分享给朋友</button>
+        
+        <div class="tip">
+            <p>提示：点击"自定义菜单"添加您喜欢的食物</p>
+        </div>
+    </div>
+
+    <!-- 自定义菜单模态框 -->
+    <div class="modal" id="customModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">自定义菜单</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">添加食物</label>
+                <input type="text" class="input-field" id="newFoodInput" placeholder="输入食物名称，如：红烧肉">
+            </div>
+            
+            <button class="btn btn-custom" id="addFoodBtn">添加</button>
+            
+            <div class="food-list" id="foodList">
+                <!-- 食物列表将通过JavaScript动态添加 -->
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn" id="resetBtn">重置</button>
+                <button class="btn btn-custom" id="saveBtn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 扩展的食物数据
+        const defaultFoods = [
+            // 南方家常菜
+            { name: "红烧肉", type: "南方家常菜", desc: "色泽红亮，肥而不腻，入口即化", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "清蒸鲈鱼", type: "南方家常菜", desc: "鲜嫩爽滑，清淡可口", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "糖醋排骨", type: "南方家常菜", desc: "酸甜适中，外酥里嫩", image: "https://images.unsplash.com/photo-1589606663923-283133d2e59a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "麻婆豆腐", type: "南方家常菜", desc: "麻辣鲜香，口感滑嫩", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "宫保鸡丁", type: "南方家常菜", desc: "麻辣酸甜，鲜香爽口", image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "鱼香肉丝", type: "南方家常菜", desc: "鱼香味浓，酸甜微辣", image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "东坡肉", type: "南方家常菜", desc: "肥而不腻，酥而不碎", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "白切鸡", type: "南方家常菜", desc: "皮爽肉滑，清淡鲜美", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            
+            // 北方家常菜
+            { name: "京酱肉丝", type: "北方家常菜", desc: "酱香浓郁，咸甜适中", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "锅包肉", type: "北方家常菜", desc: "色泽金黄，外酥里嫩", image: "https://images.unsplash.com/photo-1589606663923-283133d2e59a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "地三鲜", type: "北方家常菜", desc: "鲜爽适口，营养丰富", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "猪肉炖粉条", type: "北方家常菜", desc: "肉烂粉滑，汤汁浓郁", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "小鸡炖蘑菇", type: "北方家常菜", desc: "鸡肉鲜嫩，蘑菇香浓", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "酸菜鱼", type: "北方家常菜", desc: "酸辣开胃，鱼肉鲜嫩", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "木须肉", type: "北方家常菜", desc: "色泽鲜艳，口感丰富", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "醋溜白菜", type: "北方家常菜", desc: "酸辣可口，开胃下饭", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            
+            // 南北方小吃名吃
+            { name: "北京烤鸭", type: "北方名吃", desc: "外皮酥脆，肉质鲜嫩", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "狗不理包子", type: "北方名吃", desc: "皮薄馅大，鲜香不腻", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "羊肉泡馍", type: "北方名吃", desc: "汤浓肉烂，馍筋爽口", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "煎饼果子", type: "北方名吃", desc: "外软内脆，酱香浓郁", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "小笼包", type: "南方名吃", desc: "皮薄馅多，汤汁鲜美", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "生煎包", type: "南方名吃", desc: "底部酥脆，馅心鲜嫩", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "肠粉", type: "南方名吃", desc: "晶莹剔透，嫩滑爽口", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "桂林米粉", type: "南方名吃", desc: "米粉爽滑，汤鲜味美", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "热干面", type: "南方名吃", desc: "面条筋道，酱香浓郁", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "担担面", type: "南方名吃", desc: "麻辣鲜香，面条筋道", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "螺蛳粉", type: "南方名吃", desc: "酸辣鲜香，风味独特", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "肉夹馍", type: "北方名吃", desc: "馍香肉酥，肥而不腻", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "刀削面", type: "北方名吃", desc: "面条筋道，汤汁浓郁", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "油泼面", type: "北方名吃", desc: "香辣过瘾，面条筋道", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "炸酱面", type: "北方名吃", desc: "酱香浓郁，面条爽滑", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            
+            // 国际美食
+            { name: "披萨", type: "西餐", desc: "饼底酥脆，配料丰富", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "汉堡", type: "西餐", desc: "面包松软，肉饼多汁", image: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "寿司", type: "日料", desc: "米饭软糯，鱼生鲜美", image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "拉面", type: "日料", desc: "汤底浓郁，面条筋道", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "炸鸡", type: "韩餐", desc: "外酥里嫩，香辣可口", image: "https://images.unsplash.com/photo-1562967914-608f82629710?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "烤肉", type: "韩餐", desc: "肉质鲜嫩，香气四溢", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "冬阴功汤", type: "泰餐", desc: "酸辣开胃，香茅味浓", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "越南河粉", type: "越餐", desc: "汤清味美，河粉爽滑", image: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" },
+            { name: "咖喱鸡", type: "印餐", desc: "咖喱浓郁，鸡肉鲜嫩", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" }
+        ];
+
+        // 获取页面元素
+        const foodImage = document.getElementById('foodImage');
+        const foodName = document.getElementById('foodName');
+        const foodType = document.getElementById('foodType');
+        const foodDesc = document.getElementById('foodDesc');
+        const randomBtn = document.getElementById('randomBtn');
+        const customBtn = document.getElementById('customBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const loading = document.getElementById('loading');
+        
+        // 模态框相关元素
+        const customModal = document.getElementById('customModal');
+        const closeModal = document.getElementById('closeModal');
+        const newFoodInput = document.getElementById('newFoodInput');
+        const addFoodBtn = document.getElementById('addFoodBtn');
+        const foodList = document.getElementById('foodList');
+        const resetBtn = document.getElementById('resetBtn');
+        const saveBtn = document.getElementById('saveBtn');
+
+        // 存储用户自定义食物
+        let customFoods = [];
+        
+        // 从本地存储加载自定义食物
+        function loadCustomFoods() {
+            const savedFoods = localStorage.getItem('customFoods');
+            if (savedFoods) {
+                customFoods = JSON.parse(savedFoods);
+            }
+        }
+        
+        // 保存自定义食物到本地存储
+        function saveCustomFoods() {
+            localStorage.setItem('customFoods', JSON.stringify(customFoods));
+        }
+        
+        // 随机选择食物函数
+        function getRandomFood() {
+            // 显示加载状态
+            loading.style.display = 'block';
+            randomBtn.disabled = true;
+            
+            // 合并默认食物和自定义食物
+            const allFoods = [...defaultFoods, ...customFoods];
+            
+            // 模拟网络请求延迟
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * allFoods.length);
+                const selectedFood = allFoods[randomIndex];
+                
+                // 更新食物信息
+                foodImage.src = selectedFood.image;
+                foodImage.alt = selectedFood.name;
+                foodName.textContent = selectedFood.name;
+                foodType.textContent = selectedFood.type;
+                foodDesc.textContent = selectedFood.desc;
+                
+                // 隐藏加载状态
+                loading.style.display = 'none';
+                randomBtn.disabled = false;
+            }, 800);
+        }
+        
+        // 分享功能
+        function sharePage() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '随机美食推荐器',
+                    text: '快来试试这个随机美食推荐器，解决选择困难症！',
+                    url: window.location.href
+                })
+                .then(() => console.log('分享成功'))
+                .catch((error) => console.log('分享失败', error));
+            } else {
+                alert('请复制链接分享给朋友：' + window.location.href);
+            }
+        }
+        
+        // 打开自定义菜单模态框
+        function openCustomModal() {
+            customModal.style.display = 'flex';
+            renderCustomFoods();
+        }
+        
+        // 关闭自定义菜单模态框
+        function closeCustomModal() {
+            customModal.style.display = 'none';
+        }
+        
+        // 渲染自定义食物列表
+        function renderCustomFoods() {
+            foodList.innerHTML = '';
+            
+            if (customFoods.length === 0) {
+                foodList.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 20px;">暂无自定义食物</p>';
+                return;
+            }
+            
+            customFoods.forEach((food, index) => {
+                const foodItem = document.createElement('div');
+                foodItem.className = 'food-item';
+                
+                foodItem.innerHTML = `
+                    <span class="food-item-name">${food.name}</span>
+                    <button class="delete-btn" data-index="${index}">删除</button>
+                `;
+                
+                foodList.appendChild(foodItem);
+            });
+            
+            // 添加删除按钮事件
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    customFoods.splice(index, 1);
+                    saveCustomFoods();
+                    renderCustomFoods();
+                });
+            });
+        }
+        
+        // 添加自定义食物
+        function addCustomFood() {
+            const foodName = newFoodInput.value.trim();
+            
+            if (!foodName) {
+                alert('请输入食物名称');
+                return;
+            }
+            
+            // 创建新的食物对象
+            const newFood = {
+                name: foodName,
+                type: '自定义',
+                desc: '您自定义的美食',
+                image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+            };
+            
+            // 添加到自定义食物列表
+            customFoods.push(newFood);
+            saveCustomFoods();
+            
+            // 清空输入框
+            newFoodInput.value = '';
+            
+            // 重新渲染列表
+            renderCustomFoods();
+        }
+        
+        // 重置自定义食物
+        function resetCustomFoods() {
+            if (confirm('确定要重置所有自定义食物吗？')) {
+                customFoods = [];
+                saveCustomFoods();
+                renderCustomFoods();
+            }
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载自定义食物
+            loadCustomFoods();
+            
+            // 绑定按钮点击事件
+            randomBtn.addEventListener('click', getRandomFood);
+            customBtn.addEventListener('click', openCustomModal);
+            shareBtn.addEventListener('click', sharePage);
+            
+            // 模态框相关事件
+            closeModal.addEventListener('click', closeCustomModal);
+            addFoodBtn.addEventListener('click', addCustomFood);
+            resetBtn.addEventListener('click', resetCustomFoods);
+            saveBtn.addEventListener('click', closeCustomModal);
+            
+            // 点击模态框外部关闭
+            customModal.addEventListener('click', function(e) {
+                if (e.target === customModal) {
+                    closeCustomModal();
+                }
+            });
+            
+            // 按回车键添加食物
+            newFoodInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addCustomFood();
+                }
+            });
+            
+            // 页面加载时随机显示一个食物
+            getRandomFood();
+        });
+    </script>
+</body>
+</html>
