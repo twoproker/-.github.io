@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>随机美食推荐器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -279,16 +280,16 @@
         
         <div class="food-card">
             <img id="foodImage" class="food-image" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="美食">
-            <h2 id="foodName" class="food-name">披萨</h2>
-            <div id="foodType" class="food-type">西餐</div>
-            <p id="foodDesc" class="food-desc">点击下方按钮随机获取美食推荐</p>
+            <h2 id="foodName" class="food-name">小笼包</h2>
+            <div id="foodType" class="food-type">南方名吃</div>
+            <p id="foodDesc" class="food-desc">皮薄馅多，汤汁鲜美</p>
         </div>
         
         <div class="loading" id="loading">正在挑选美味...</div>
         
-        <button class="btn" id="randomBtn">🎲 随机推荐</button>
-        <button class="btn btn-custom" id="customBtn">📝 自定义菜单</button>
-        <button class="btn btn-secondary" id="shareBtn">📱 分享给朋友</button>
+        <button class="btn" id="randomBtn"><i class="fas fa-random"></i> 随机推荐</button>
+        <button class="btn btn-custom" id="customBtn"><i class="fas fa-edit"></i> 自定义菜单</button>
+        <button class="btn btn-secondary" id="shareBtn"><i class="fas fa-share-alt"></i> 分享给朋友</button>
         
         <div class="tip">
             <p>提示：点击"自定义菜单"添加您喜欢的食物</p>
@@ -411,8 +412,8 @@
         // 图片加载失败处理
         function handleImageError(img) {
             // 使用备用图片
-            img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5Ij7mnI3liqHlm77niYc8L3RleHQ+PC9zdmc+';
-            img.alt = '图片加载失败';
+            img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZlYWE3Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjZDM1NDAwIj7kuLvlgZk8L3RleHQ+PC9zdmc+';
+            img.alt = '美食图片';
         }
         
         // 随机选择食物函数
