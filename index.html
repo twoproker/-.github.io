@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>随机美食推荐器</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -30,7 +29,7 @@
             text-align: center;
             margin-bottom: 20px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
@@ -60,13 +59,28 @@
             text-align: center;
         }
         
-        .food-image {
+        .food-image-container {
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            object-fit: cover;
             margin: 0 auto 15px;
             border: 4px solid #ffeaa7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff5e6;
+            overflow: hidden;
+        }
+        
+        .food-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .food-icon {
+            font-size: 50px;
+            color: #e74c3c;
         }
         
         .food-name {
@@ -113,11 +127,6 @@
         .btn-custom {
             background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
             box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
         }
         
         .loading {
@@ -254,7 +263,7 @@
                 padding: 5px;
             }
             
-            .food-image {
+            .food-image-container {
                 width: 100px;
                 height: 100px;
             }
@@ -279,7 +288,9 @@
         </div>
         
         <div class="food-card">
-            <img id="foodImage" class="food-image" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="美食">
+            <div class="food-image-container">
+                <div class="food-icon">🥟</div>
+            </div>
             <h2 id="foodName" class="food-name">小笼包</h2>
             <div id="foodType" class="food-type">南方名吃</div>
             <p id="foodDesc" class="food-desc">皮薄馅多，汤汁鲜美</p>
@@ -287,9 +298,8 @@
         
         <div class="loading" id="loading">正在挑选美味...</div>
         
-        <button class="btn" id="randomBtn"><i class="fas fa-random"></i> 随机推荐</button>
-        <button class="btn btn-custom" id="customBtn"><i class="fas fa-edit"></i> 自定义菜单</button>
-        <button class="btn btn-secondary" id="shareBtn"><i class="fas fa-share-alt"></i> 分享给朋友</button>
+        <button class="btn" id="randomBtn">随机推荐</button>
+        <button class="btn btn-custom" id="customBtn">自定义菜单</button>
         
         <div class="tip">
             <p>提示：点击"自定义菜单"添加您喜欢的食物</p>
@@ -323,65 +333,102 @@
     </div>
 
     <script>
-        // 扩展的食物数据 - 使用可靠的图片链接
+        // 扩展的食物数据 - 使用表情符号代替图片
         const defaultFoods = [
             // 南方家常菜
-            { name: "红烧肉", type: "南方家常菜", desc: "色泽红亮，肥而不腻，入口即化", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "清蒸鲈鱼", type: "南方家常菜", desc: "鲜嫩爽滑，清淡可口", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "糖醋排骨", type: "南方家常菜", desc: "酸甜适中，外酥里嫩", image: "https://images.unsplash.com/photo-1589606663923-283133d2e59a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "麻婆豆腐", type: "南方家常菜", desc: "麻辣鲜香，口感滑嫩", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "宫保鸡丁", type: "南方家常菜", desc: "麻辣酸甜，鲜香爽口", image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "鱼香肉丝", type: "南方家常菜", desc: "鱼香味浓，酸甜微辣", image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "东坡肉", type: "南方家常菜", desc: "肥而不腻，酥而不碎", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "白切鸡", type: "南方家常菜", desc: "皮爽肉滑，清淡鲜美", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
+            { name: "红烧肉", type: "南方家常菜", desc: "色泽红亮，肥而不腻，入口即化", icon: "🍖" },
+            { name: "清蒸鲈鱼", type: "南方家常菜", desc: "鲜嫩爽滑，清淡可口", icon: "🐟" },
+            { name: "糖醋排骨", type: "南方家常菜", desc: "酸甜适中，外酥里嫩", icon: "🍖" },
+            { name: "麻婆豆腐", type: "南方家常菜", desc: "麻辣鲜香，口感滑嫩", icon: "🧈" },
+            { name: "宫保鸡丁", type: "南方家常菜", desc: "麻辣酸甜，鲜香爽口", icon: "🍗" },
+            { name: "鱼香肉丝", type: "南方家常菜", desc: "鱼香味浓，酸甜微辣", icon: "🍖" },
+            { name: "东坡肉", type: "南方家常菜", desc: "肥而不腻，酥而不碎", icon: "🍖" },
+            { name: "白切鸡", type: "南方家常菜", desc: "皮爽肉滑，清淡鲜美", icon: "🍗" },
+            { name: "梅菜扣肉", type: "南方家常菜", desc: "肉质软烂，肥而不腻", icon: "🍖" },
+            { name: "蚝油生菜", type: "南方家常菜", desc: "清淡爽口，蚝油鲜香", icon: "🥬" },
             
             // 北方家常菜
-            { name: "京酱肉丝", type: "北方家常菜", desc: "酱香浓郁，咸甜适中", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "锅包肉", type: "北方家常菜", desc: "色泽金黄，外酥里嫩", image: "https://images.unsplash.com/photo-1589606663923-283133d2e59a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "地三鲜", type: "北方家常菜", desc: "鲜爽适口，营养丰富", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "猪肉炖粉条", type: "北方家常菜", desc: "肉烂粉滑，汤汁浓郁", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "小鸡炖蘑菇", type: "北方家常菜", desc: "鸡肉鲜嫩，蘑菇香浓", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "酸菜鱼", type: "北方家常菜", desc: "酸辣开胃，鱼肉鲜嫩", image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "木须肉", type: "北方家常菜", desc: "色泽鲜艳，口感丰富", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "醋溜白菜", type: "北方家常菜", desc: "酸辣可口，开胃下饭", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
+            { name: "京酱肉丝", type: "北方家常菜", desc: "酱香浓郁，咸甜适中", icon: "🍖" },
+            { name: "锅包肉", type: "北方家常菜", desc: "色泽金黄，外酥里嫩", icon: "🍖" },
+            { name: "地三鲜", type: "北方家常菜", desc: "鲜爽适口，营养丰富", icon: "🍆" },
+            { name: "猪肉炖粉条", type: "北方家常菜", desc: "肉烂粉滑，汤汁浓郁", icon: "🍖" },
+            { name: "小鸡炖蘑菇", type: "北方家常菜", desc: "鸡肉鲜嫩，蘑菇香浓", icon: "🍄" },
+            { name: "酸菜鱼", type: "北方家常菜", desc: "酸辣开胃，鱼肉鲜嫩", icon: "🐟" },
+            { name: "木须肉", type: "北方家常菜", desc: "色泽鲜艳，口感丰富", icon: "🍖" },
+            { name: "醋溜白菜", type: "北方家常菜", desc: "酸辣可口，开胃下饭", icon: "🥬" },
+            { name: "葱爆羊肉", type: "北方家常菜", desc: "羊肉鲜嫩，葱香浓郁", icon: "🍖" },
+            { name: "酱骨架", type: "北方家常菜", desc: "酱香浓郁，肉质酥烂", icon: "🍖" },
+            
+            // 川菜
+            { name: "水煮鱼", type: "川菜", desc: "麻辣鲜香，鱼肉嫩滑", icon: "🐟" },
+            { name: "回锅肉", type: "川菜", desc: "肥而不腻，入口浓香", icon: "🍖" },
+            { name: "夫妻肺片", type: "川菜", desc: "麻辣浓香，质地软嫩", icon: "🥩" },
+            { name: "辣子鸡", type: "川菜", desc: "麻辣干香，酥脆爽口", icon: "🍗" },
+            { name: "毛血旺", type: "川菜", desc: "麻辣鲜香，内容丰富", icon: "🥘" },
+            { name: "口水鸡", type: "川菜", desc: "麻辣鲜香，嫩滑多汁", icon: "🍗" },
+            
+            // 湘菜
+            { name: "剁椒鱼头", type: "湘菜", desc: "鲜辣适口，风味独特", icon: "🐟" },
+            { name: "农家小炒肉", type: "湘菜", desc: "香辣可口，非常下饭", icon: "🍖" },
+            { name: "湘西土匪鸭", type: "湘菜", desc: "香辣浓郁，鸭肉鲜嫩", icon: "🦆" },
+            { name: "腊味合蒸", type: "湘菜", desc: "腊香浓重，咸甜适口", icon: "🍖" },
+            
+            // 粤菜
+            { name: "白切鸡", type: "粤菜", desc: "皮爽肉滑，清淡鲜美", icon: "🍗" },
+            { name: "叉烧", type: "粤菜", desc: "色泽红亮，甜咸适中", icon: "🍖" },
+            { name: "豉汁蒸排骨", type: "粤菜", desc: "豉香浓郁，排骨鲜嫩", icon: "🍖" },
+            { name: "蚝皇凤爪", type: "粤菜", desc: "软糯入味，胶质丰富", icon: "🐔" },
+            { name: "清蒸石斑鱼", type: "粤菜", desc: "鱼肉鲜嫩，原汁原味", icon: "🐟" },
+            
+            // 江浙菜
+            { name: "西湖醋鱼", type: "江浙菜", desc: "酸甜适中，鱼肉鲜嫩", icon: "🐟" },
+            { name: "龙井虾仁", type: "江浙菜", desc: "茶香清幽，虾仁鲜嫩", icon: "🍤" },
+            { name: "叫花鸡", type: "江浙菜", desc: "肉质鲜嫩，荷香四溢", icon: "🍗" },
+            { name: "东坡肉", type: "江浙菜", desc: "肥而不腻，酥而不碎", icon: "🍖" },
+            { name: "腌笃鲜", type: "江浙菜", desc: "汤白汁浓，肉质酥肥", icon: "🍲" },
             
             // 南北方小吃名吃
-            { name: "北京烤鸭", type: "北方名吃", desc: "外皮酥脆，肉质鲜嫩", image: "https://images.unsplash.com/photo-1585032226651-759b368d7246?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "狗不理包子", type: "北方名吃", desc: "皮薄馅大，鲜香不腻", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "羊肉泡馍", type: "北方名吃", desc: "汤浓肉烂，馍筋爽口", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "煎饼果子", type: "北方名吃", desc: "外软内脆，酱香浓郁", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "小笼包", type: "南方名吃", desc: "皮薄馅多，汤汁鲜美", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "生煎包", type: "南方名吃", desc: "底部酥脆，馅心鲜嫩", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "肠粉", type: "南方名吃", desc: "晶莹剔透，嫩滑爽口", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "桂林米粉", type: "南方名吃", desc: "米粉爽滑，汤鲜味美", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "热干面", type: "南方名吃", desc: "面条筋道，酱香浓郁", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "担担面", type: "南方名吃", desc: "麻辣鲜香，面条筋道", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "螺蛳粉", type: "南方名吃", desc: "酸辣鲜香，风味独特", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "肉夹馍", type: "北方名吃", desc: "馍香肉酥，肥而不腻", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "刀削面", type: "北方名吃", desc: "面条筋道，汤汁浓郁", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "油泼面", type: "北方名吃", desc: "香辣过瘾，面条筋道", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "炸酱面", type: "北方名吃", desc: "酱香浓郁，面条爽滑", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
+            { name: "北京烤鸭", type: "北方名吃", desc: "外皮酥脆，肉质鲜嫩", icon: "🦆" },
+            { name: "狗不理包子", type: "北方名吃", desc: "皮薄馅大，鲜香不腻", icon: "🥟" },
+            { name: "羊肉泡馍", type: "北方名吃", desc: "汤浓肉烂，馍筋爽口", icon: "🍲" },
+            { name: "煎饼果子", type: "北方名吃", desc: "外软内脆，酱香浓郁", icon: "🌯" },
+            { name: "小笼包", type: "南方名吃", desc: "皮薄馅多，汤汁鲜美", icon: "🥟" },
+            { name: "生煎包", type: "南方名吃", desc: "底部酥脆，馅心鲜嫩", icon: "🥟" },
+            { name: "肠粉", type: "南方名吃", desc: "晶莹剔透，嫩滑爽口", icon: "🍜" },
+            { name: "桂林米粉", type: "南方名吃", desc: "米粉爽滑，汤鲜味美", icon: "🍜" },
+            { name: "热干面", type: "南方名吃", desc: "面条筋道，酱香浓郁", icon: "🍜" },
+            { name: "担担面", type: "南方名吃", desc: "麻辣鲜香，面条筋道", icon: "🍜" },
+            { name: "螺蛳粉", type: "南方名吃", desc: "酸辣鲜香，风味独特", icon: "🍜" },
+            { name: "肉夹馍", type: "北方名吃", desc: "馍香肉酥，肥而不腻", icon: "🥙" },
+            { name: "刀削面", type: "北方名吃", desc: "面条筋道，汤汁浓郁", icon: "🍜" },
+            { name: "油泼面", type: "北方名吃", desc: "香辣过瘾，面条筋道", icon: "🍜" },
+            { name: "炸酱面", type: "北方名吃", desc: "酱香浓郁，面条爽滑", icon: "🍜" },
+            { name: "驴肉火烧", type: "北方名吃", desc: "外酥里嫩，香味浓郁", icon: "🥙" },
+            { name: "兰州拉面", type: "北方名吃", desc: "汤清味美，面条筋道", icon: "🍜" },
+            { name: "重庆小面", type: "南方名吃", desc: "麻辣鲜香，面条劲道", icon: "🍜" },
+            { name: "过桥米线", type: "南方名吃", desc: "汤鲜味美，米线爽滑", icon: "🍜" },
+            { name: "豆皮", type: "南方名吃", desc: "外脆内软，馅料丰富", icon: "🫓" },
             
             // 国际美食
-            { name: "披萨", type: "西餐", desc: "饼底酥脆，配料丰富", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "汉堡", type: "西餐", desc: "面包松软，肉饼多汁", image: "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "寿司", type: "日料", desc: "米饭软糯，鱼生鲜美", image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "拉面", type: "日料", desc: "汤底浓郁，面条筋道", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "炸鸡", type: "韩餐", desc: "外酥里嫩，香辣可口", image: "https://images.unsplash.com/photo-1562967914-608f82629710?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "烤肉", type: "韩餐", desc: "肉质鲜嫩，香气四溢", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "冬阴功汤", type: "泰餐", desc: "酸辣开胃，香茅味浓", image: "https://images.unsplash.com/photo-1589647363585-f4a7d3877b10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "越南河粉", type: "越餐", desc: "汤清味美，河粉爽滑", image: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" },
-            { name: "咖喱鸡", type: "印餐", desc: "咖喱浓郁，鸡肉鲜嫩", image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" }
+            { name: "披萨", type: "西餐", desc: "饼底酥脆，配料丰富", icon: "🍕" },
+            { name: "汉堡", type: "西餐", desc: "面包松软，肉饼多汁", icon: "🍔" },
+            { name: "寿司", type: "日料", desc: "米饭软糯，鱼生鲜美", icon: "🍣" },
+            { name: "拉面", type: "日料", desc: "汤底浓郁，面条筋道", icon: "🍜" },
+            { name: "炸鸡", type: "韩餐", desc: "外酥里嫩，香辣可口", icon: "🍗" },
+            { name: "烤肉", type: "韩餐", desc: "肉质鲜嫩，香气四溢", icon: "🥩" },
+            { name: "冬阴功汤", type: "泰餐", desc: "酸辣开胃，香茅味浓", icon: "🍲" },
+            { name: "越南河粉", type: "越餐", desc: "汤清味美，河粉爽滑", icon: "🍜" },
+            { name: "咖喱鸡", type: "印餐", desc: "咖喱浓郁，鸡肉鲜嫩", icon: "🍛" },
+            { name: "意大利面", type: "西餐", desc: "面条劲道，酱汁浓郁", icon: "🍝" }
         ];
 
         // 获取页面元素
-        const foodImage = document.getElementById('foodImage');
+        const foodImageContainer = document.querySelector('.food-image-container');
         const foodName = document.getElementById('foodName');
         const foodType = document.getElementById('foodType');
         const foodDesc = document.getElementById('foodDesc');
         const randomBtn = document.getElementById('randomBtn');
         const customBtn = document.getElementById('customBtn');
-        const shareBtn = document.getElementById('shareBtn');
         const loading = document.getElementById('loading');
         
         // 模态框相关元素
@@ -409,13 +456,6 @@
             localStorage.setItem('customFoods', JSON.stringify(customFoods));
         }
         
-        // 图片加载失败处理
-        function handleImageError(img) {
-            // 使用备用图片
-            img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZlYWE3Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjZDM1NDAwIj7kuLvlgZk8L3RleHQ+PC9zdmc+';
-            img.alt = '美食图片';
-        }
-        
         // 随机选择食物函数
         function getRandomFood() {
             // 显示加载状态
@@ -431,11 +471,7 @@
                 const selectedFood = allFoods[randomIndex];
                 
                 // 更新食物信息
-                foodImage.onerror = function() {
-                    handleImageError(this);
-                };
-                foodImage.src = selectedFood.image;
-                foodImage.alt = selectedFood.name;
+                foodImageContainer.innerHTML = `<div class="food-icon">${selectedFood.icon}</div>`;
                 foodName.textContent = selectedFood.name;
                 foodType.textContent = selectedFood.type;
                 foodDesc.textContent = selectedFood.desc;
@@ -444,21 +480,6 @@
                 loading.style.display = 'none';
                 randomBtn.disabled = false;
             }, 800);
-        }
-        
-        // 分享功能
-        function sharePage() {
-            if (navigator.share) {
-                navigator.share({
-                    title: '随机美食推荐器',
-                    text: '快来试试这个随机美食推荐器，解决选择困难症！',
-                    url: window.location.href
-                })
-                .then(() => console.log('分享成功'))
-                .catch((error) => console.log('分享失败', error));
-            } else {
-                alert('请复制链接分享给朋友：' + window.location.href);
-            }
         }
         
         // 打开自定义菜单模态框
@@ -518,7 +539,7 @@
                 name: foodName,
                 type: '自定义',
                 desc: '您自定义的美食',
-                image: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZlYWE3Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjZDM1NDAwIj7kuLvlgZk8L3RleHQ+PC9zdmc+'
+                icon: '🍽️'
             };
             
             // 添加到自定义食物列表
@@ -549,7 +570,6 @@
             // 绑定按钮点击事件
             randomBtn.addEventListener('click', getRandomFood);
             customBtn.addEventListener('click', openCustomModal);
-            shareBtn.addEventListener('click', sharePage);
             
             // 模态框相关事件
             closeModal.addEventListener('click', closeCustomModal);
@@ -573,11 +593,6 @@
             
             // 页面加载时随机显示一个食物
             getRandomFood();
-            
-            // 为初始图片添加错误处理
-            foodImage.onerror = function() {
-                handleImageError(this);
-            };
         });
     </script>
 </body>
