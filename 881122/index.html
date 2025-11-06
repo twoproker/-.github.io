@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机美食推荐器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🍽️</div>
+            <h1>随机美食推荐器</h1>
+            <p class="subtitle">解决你的选择困难症</p>
+        </div>
+        
+        <div class="food-card">
+            <div class="food-image-container">
+                <div class="food-icon">🥟</div>
+            </div>
+            <h2 id="foodName" class="food-name">小笼包</h2>
+            <div id="foodType" class="food-type">南方名吃</div>
+            <p id="foodDesc" class="food-desc">皮薄馅多，汤汁鲜美</p>
+        </div>
+        
+        <div class="loading" id="loading">正在挑选美味...</div>
+        
+        <button class="btn" id="randomBtn">随机推荐</button>
+        <button class="btn btn-custom" id="customBtn">自定义菜单</button>
+        
+        <div class="tip">
+            <p>提示：点击"自定义菜单"添加您喜欢的食物</p>
+        </div>
+    </div>
+
+    <!-- 自定义菜单模态框 -->
+    <div class="modal" id="customModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">自定义菜单</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">添加食物</label>
+                <input type="text" class="input-field" id="newFoodInput" placeholder="输入食物名称，如：红烧肉">
+            </div>
+            
+            <button class="btn btn-custom" id="addFoodBtn">添加</button>
+            
+            <div class="food-list" id="foodList">
+                <!-- 食物列表将通过JavaScript动态添加 -->
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn" id="resetBtn">重置</button>
+                <button class="btn btn-custom" id="saveBtn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
